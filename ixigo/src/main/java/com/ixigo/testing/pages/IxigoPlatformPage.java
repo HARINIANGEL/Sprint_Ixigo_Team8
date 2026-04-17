@@ -23,19 +23,22 @@ public class IxigoPlatformPage {
     // Actions
 
     public void enterTrain(String train) {
-        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(trainInput));
-        
-        input.clear();
-       
-        input.sendKeys(train);
-        
-        input.sendKeys(Keys.ENTER);  
-        
-        try {
-            Thread.sleep(2000); 
-        } catch (Exception e) {}
-    }
 
+        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(trainInput));
+
+        input.clear();
+        input.sendKeys(train);
+       
+        wait.until(driver -> input.getAttribute("value").length() > 2);
+
+        try {
+            Thread.sleep(800); 
+        } catch (Exception e) {}
+        
+        input.sendKeys(Keys.ENTER);
+
+        wait.until(ExpectedConditions.attributeContains(input, "value", train.substring(0, 2)));
+    }
     public void clickSearch() {
         WebElement btn = wait.until(ExpectedConditions.presenceOfElementLocated(searchBtn));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);

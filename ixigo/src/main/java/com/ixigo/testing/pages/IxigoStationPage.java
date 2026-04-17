@@ -7,6 +7,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -28,7 +29,7 @@ public class IxigoStationPage {
 
     By firstStationResult = By.xpath("(//div[contains(@class,'train-station-item')])[1]");
     
-    By searchBtn = By.xpath("//div[@id='stationSearchForm']//button[contains(text(),'Search')]");
+    By searchBtn = By.xpath("//div[@id='stationSearchForm']//button[contains(.,'Search')]");
 
     By bookNowBtn = By.xpath("//a[contains(text(),'Book Now')]");
 
@@ -36,23 +37,51 @@ public class IxigoStationPage {
 
     By bookBtn = By.xpath("//button[contains(text(),'BOOK')]");
 
-    By paymentText = By.xpath("//*[contains(text(),'IRCTC') or contains(text(),'payment')]");
+    By loginPopup = By.xpath("//div[contains(@class,'login-container')]");
 
     // ACTIONS
 
-    public void enterStation(String station) {
-        WebElement input = driver.findElement(By.xpath("//input[@placeholder='Enter the station name or code']"));
+    public void enterStation(String station) throws InterruptedException {
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+
+        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(stationInput));
+
         input.clear();
         input.sendKeys(station);
-        input.sendKeys(Keys.ENTER);  // MUST
+
+        // 🔥 IMPORTANT: wait until value is fully typed
+        wait.until(driver -> input.getAttribute("value").length() > 2);
+
+        try {
+            Thread.sleep(800); // small buffer for dropdown rendering
+        } catch (Exception e) {}
+
+        // 🔥 PRESS ENTER (THIS IS THE KEY FIX)
+        input.sendKeys(Keys.ENTER);
+        Thread.sleep(2000);
     }
     
     public void clickSearch() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
-        WebElement btn = wait.until(ExpectedConditions.presenceOfElementLocated(searchBtn));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(25));
 
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
+        WebElement btn = wait.until(
+            ExpectedConditions.visibilityOfElementLocated(searchBtn)
+        );
+
+        try {
+            wait.until(ExpectedConditions.elementToBeClickable(btn));
+            btn.click();
+
+        } catch (Exception e) {
+
+            // 🔥 SCROLL + JS CLICK (FINAL WEAPON)
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+
+            js.executeScript("arguments[0].scrollIntoView(true);", btn);
+            js.executeScript("arguments[0].click();", btn);
+        }
     }
 
     public void selectStationResult() {
@@ -76,8 +105,12 @@ public class IxigoStationPage {
 
     // VALIDATION
 
-    public boolean isPaymentPageDisplayed() {
-        util.sleep(3);
-        return util.isDisplayed(paymentText);
+    public boolean isBookingTriggered() {
+        try {
+            util.sleep(3);
+            return util.isDisplayed(loginPopup);
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

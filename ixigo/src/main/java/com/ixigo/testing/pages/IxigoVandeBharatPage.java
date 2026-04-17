@@ -1,11 +1,19 @@
 package com.ixigo.testing.pages;
 
 import org.openqa.selenium.By;
+
 import org.openqa.selenium.JavascriptExecutor;
 //import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.Keys;
+
+import java.time.Duration;
+import java.util.List;
+
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
 
 public class IxigoVandeBharatPage {
 
@@ -22,20 +30,32 @@ public class IxigoVandeBharatPage {
     By searchBtn = By.cssSelector("div.search button");
     By availableDate = By.xpath("(//p[contains(text(),'Available')])[1]");
     By bookBtn = By.xpath("//button[contains(text(),'Book')]");
+    By calendarField = By.xpath("//div[contains(@class,'date')]");
+    By nextMonth = By.xpath("//button[contains(@class,'rd-next')]");
+    By june15 = By.xpath("//td[@data-date='15062026']");
 
     // Actions
 
     public void enterFrom(String from) {
+
         WebElement input = driver.findElement(fromInput);
 
         input.click();
-        input.sendKeys(Keys.CONTROL + "a"); // select all
-        input.sendKeys(Keys.DELETE);        // clear old value
+        input.sendKeys(Keys.CONTROL + "a");
+        input.sendKeys(Keys.DELETE);
 
         input.sendKeys(from);
+
+        // WAIT until value is correctly set
+        new WebDriverWait(driver, Duration.ofSeconds(10)).until(d -> input.getAttribute("value").toLowerCase().contains(from.toLowerCase()));
+
+        try { Thread.sleep(500); } catch (Exception e) {}
+
+        // THEN ENTER (safe)
         input.sendKeys(Keys.ENTER);
     }
     public void enterTo(String to) {
+
         WebElement input = driver.findElement(toInput);
 
         input.click();
@@ -43,46 +63,75 @@ public class IxigoVandeBharatPage {
         input.sendKeys(Keys.DELETE);
 
         input.sendKeys(to);
+
+        new WebDriverWait(driver, Duration.ofSeconds(10)).until(d -> input.getAttribute("value").toLowerCase().contains(to.toLowerCase()));
+
+        try { Thread.sleep(500); } catch (Exception e) {}
+
         input.sendKeys(Keys.ENTER);
     }
-
-//    public void selectDate() {
-//        try {
-//            WebElement dateField = driver.findElement(dateInput);
-//
-//            // set date directly
-//            JavascriptExecutor js = (JavascriptExecutor) driver;
-//            js.executeScript("arguments[0].value='20 Apr, Sun';", dateField);
-//
-//            // trigger change event (VERY IMPORTANT)
-//            js.executeScript("arguments[0].dispatchEvent(new Event('change'));", dateField);
-//
-//            Thread.sleep(2000);
-//
-//        } catch (Exception e) {
-//            System.out.println("Date set failed");
-//        }
-//    }
+    
+    
     public void clickSearch() {
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(
+            By.xpath("//button[contains(text(),'Search')]")
+        ));
+
         try {
-            Thread.sleep(2000);
-
-            WebElement btn = driver.findElement(searchBtn);
-
-            JavascriptExecutor js = (JavascriptExecutor) driver;
-
-            // scroll
-            js.executeScript("arguments[0].scrollIntoView(true);", btn);
-
-            Thread.sleep(1000);
-
-            // JS click (must for ixigo)
-            js.executeScript("arguments[0].click();", btn);
-
+            btn.click();
         } catch (Exception e) {
-            System.out.println("Search click failed");
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
         }
+
+        wait.until(ExpectedConditions.urlContains("/search/result/train/"));
     }
+    
+    public void changeDateInURL(String newDate) {
+
+        String currentUrl = driver.getCurrentUrl();
+
+        // Replace date (8 digit format)
+        String updatedUrl = currentUrl.replaceAll("\\d{8}", newDate);
+
+        driver.get(updatedUrl);
+    }
+    
+    By firstTrain = By.xpath("(//div[contains(@class,'train-listing-row')])[1]");
+
+    public void selectFirstTrain() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+
+        WebElement train = wait.until(ExpectedConditions.visibilityOfElementLocated(firstTrain));
+
+        // Scroll into view
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", train);
+    }
+    
+    By availableClass = By.xpath("(//div[contains(@class,'train-class-main') and contains(@class,'green')])[1]");
+
+    public void selectAvailableClass() {
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+
+        WebElement cls = wait.until(ExpectedConditions.elementToBeClickable(availableClass));
+
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", cls);
+    }
+    
+    By bookBtn1 = By.xpath("(//button[contains(text(),'Book')])[1]");
+
+    public void clickBook() {
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(bookBtn1));
+
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
+    }
+    
 
     public void selectTrainAndBook() {
         try {

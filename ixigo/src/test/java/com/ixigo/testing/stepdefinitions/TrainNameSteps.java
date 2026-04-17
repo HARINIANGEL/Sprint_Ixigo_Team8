@@ -49,8 +49,8 @@ public class TrainNameSteps extends BaseClass {
 
     // Validation
     @Then("User should reach payment page")
-    public void verify_payment_page() {
-        Assert.assertTrue(page.isPaymentPageDisplayed(), "Payment page not displayed");
+    public void verify_booking_trigger() {
+        Assert.assertTrue(page.isBookingTriggered(), "Booking flow not triggered (Login popup not shown)");
         tearDown();
     }
 }

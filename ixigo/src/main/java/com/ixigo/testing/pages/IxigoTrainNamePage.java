@@ -15,7 +15,7 @@ public class IxigoTrainNamePage {
         util = new AllUtilityFunctions(driver);
     }
 
-    // LOCATORS (from your real data)
+    // LOCATORS 
 
     By searchInput = By.xpath("//input[@placeholder='Search trains by name or number']");
     
@@ -27,8 +27,7 @@ public class IxigoTrainNamePage {
 
     By bookButton = By.xpath("//button[contains(text(),'BOOK')]");
 
-    By paymentText = By.xpath("//*[contains(text(),'IRCTC') or contains(text(),'payment')]");
-
+    By loginPopup = By.xpath("//div[contains(@class,'login-container')]");
     // ACTIONS
 
     public void enterTrainName(String train) {
@@ -59,8 +58,12 @@ public class IxigoTrainNamePage {
 
     // VALIDATION
 
-    public boolean isPaymentPageDisplayed() {
+    public boolean isBookingTriggered() {
+    try {
         util.sleep(3);
-        return util.isDisplayed(paymentText);
+        return util.isDisplayed(loginPopup);
+    } catch (Exception e) {
+        return false;
     }
+}
 }

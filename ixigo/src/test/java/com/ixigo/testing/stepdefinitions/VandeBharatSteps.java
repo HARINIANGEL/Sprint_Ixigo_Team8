@@ -26,6 +26,11 @@ public class VandeBharatSteps extends BaseClass {
     public void enter_to(String to) {
         page.enterTo(to);
     }
+    
+    @When("User changes journey date to {string}")
+    public void change_date(String date) {
+        page.changeDateInURL(date);
+    }
 
 //    @When("User selects journey date")
 //    public void select_date() {
