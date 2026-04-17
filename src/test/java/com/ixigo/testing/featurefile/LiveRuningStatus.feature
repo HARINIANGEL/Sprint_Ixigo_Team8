@@ -5,5 +5,9 @@ Given click the  train module
 And click the live train sub module 
 When Click the search train field 
 And enter the train name
+|trainname|
+|19037|
 And click the check live runing train 
 Then verify the live train page 
+|verifyPage|
+|Frequently Asked Questions (FAQs)|

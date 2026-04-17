@@ -258,11 +258,23 @@ public class AllUtilityFunctions {
 
     public static void captureFailure(WebDriver driver, String testName) {
         try {
+            // 1. Sanitize the name
             String name = testName.replaceAll(" ", "_");
-            String path = takeScreenshot(driver, name);
+            
+            // 2. Get the relative path from your takeScreenshot method
+            String relativePath = takeScreenshot(driver, name);
+            
+            // 3. Convert to Absolute Path (This is the fix)
+            File f = new File(relativePath);
+            String absolutePath = f.getAbsolutePath();
+            
+            // 4. Log the failure and attach the ABSOLUTE path
             test.fail("Test Failed: " + name);
-            test.addScreenCaptureFromPath(path);
+            test.addScreenCaptureFromPath(absolutePath);
+            
+            System.out.println("Screenshot attached to report from: " + absolutePath);
         } catch (Exception e) {
+            System.err.println("Failed to capture screenshot: " + e.getMessage());
             e.printStackTrace();
         }
     }

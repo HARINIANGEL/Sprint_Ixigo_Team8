@@ -9,3 +9,4 @@ Then verify the pnr message page
 Examples:
 |pnr|
 |1234567890|
+|1234567823|

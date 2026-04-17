@@ -4,11 +4,12 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.ixigo.testing.utilities.AllUtilityFunctions;
+import com.ixigo.testing.utilities.BaseClass;
 
 public class RunningStatusPage {
 
 	//webelement locator
-	@FindBy(xpath="//h1[@class='name-number-cntr u-ib u-v-align-middle']")
+	@FindBy(xpath="//h2[.='Frequently Asked Questions (FAQs)']")
 	private WebElement trainname;
 
 	
@@ -20,10 +21,9 @@ public class RunningStatusPage {
 	
 	
 	//bussiness logic 
-	public boolean verifyrunningStatusPage(String name) {
-		if(name.contains(getTrainname().getText())) {
-			return true;
-		}
-		return false;
+	public String verifyrunningStatusPage() {
+		AllUtilityFunctions.waitForVisibility(BaseClass.driver, trainname, 20);
+			return getTrainname().getText();
+		
 	}
 }

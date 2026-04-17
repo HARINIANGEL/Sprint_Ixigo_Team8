@@ -52,7 +52,7 @@ public class Hook extends AllUtilityFunctions{
         //  Handle popup safely
         AllUtilityFunctions.handlePopup(b.driver, "wiz-iframe-intent", By.id("closeButton"));
 
-        AllUtilityFunctions.pass("Application launched successfully");
+        
     }
 
     
@@ -73,7 +73,7 @@ public class Hook extends AllUtilityFunctions{
         }
 
         //  Close browser
-        b.driver.quit();
+        //b.driver.quit();
 
         //  Save report
         AllUtilityFunctions.getReport().flush();
